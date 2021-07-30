@@ -1,0 +1,12 @@
+#Query to check regionwise sales distribution
+
+SELECT 
+A.country AS Country,
+SUM(amount) AS Total_Amount
+FROM payment E
+INNER JOIN customer B ON B.customer_id = E.customer_id
+INNER JOIN address C ON B.address_id = C.address_id
+INNER JOIN city D ON C.city_id = D.city_id
+INNER JOIN country A ON D.country_id = A.country_id
+GROUP BY A.country
+ORDER BY SUM(amount) DESC
