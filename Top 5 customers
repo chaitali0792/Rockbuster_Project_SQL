@@ -1,0 +1,36 @@
+#Query to find top 5 customers from top 10 cities based on total amount they paid.
+
+SELECT B.customer_id AS Customer_ID,
+B.first_name AS Customer_First_Name, 
+B.first_name AS Customer_First_Name, 
+B.last_name AS Customer_Last_Name,
+A.country AS Country,
+D.city AS City,
+SUM(amount) AS Total_Amount
+FROM payment E
+INNER JOIN customer B ON B.customer_id = E.customer_id
+INNER JOIN address C ON B.address_id = C.address_id
+INNER JOIN city D ON C.city_id = D.city_id
+INNER JOIN country A ON D.country_id = A.country_id
+WHERE D.city IN
+(
+SELECT D.city
+FROM customer B
+INNER JOIN address C ON B.address_id = C.address_id
+INNER JOIN city D ON D.city_id = C.city_id
+INNER JOIN country A ON D.country_id = A.country_id
+WHERE country IN
+(
+SELECT A.country 
+FROM country A
+INNER JOIN city B ON A.country_id = B.country_id
+INNER JOIN address C ON B.city_id = C.city_id
+INNER JOIN customer D ON D.address_id = C.address_id
+GROUP BY A.country
+ORDER BY COUNT(customer_id) DESC LIMIT 10)
+GROUP BY D.city
+ORDER BY COUNT(customer_id) DESC LIMIT 10
+)
+GROUP BY B.customer_id, B.first_name, B.last_name, A.country, D.city  
+ORDER BY SUM(amount) DESC
+LIMIT 5;
